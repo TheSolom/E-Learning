@@ -1,17 +1,21 @@
 import express from 'express';
+import "express-async-errors";
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
 
-import errorMiddleware from './middlewares/error.middleware.js';
-import errorHandler from './utils/error-handler.util.js';
+import errorMiddleware from './middleware/error.js';
+import errorHandler from './utils/error-handler.js';
+import authRoutes from './modules/auth/auth.routes.js';
 
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use(cookieParser());
 app.use(cors());
 app.use(helmet());
 app.use(compression());
@@ -28,8 +32,10 @@ app.get(['/', '/api', '/api/v1'], (_req, res) => {
     });
 });
 
+app.use('/api/v1/auth', authRoutes);
+
 app.all('*', (req, _res, next) => {
-    next(new errorHandler(`Not available route`, 400, `${req.method} ${req.url}`));
+    next(new errorHandler(`Route not found`, 400, `${req.method} ${req.url}`));
 });
 
 app.use(errorMiddleware);
