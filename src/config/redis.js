@@ -1,9 +1,10 @@
 import { Redis } from 'ioredis';
 
-if (!process.env.REDIS_URI) {
-    throw new Error('REDIS_URI environment variable must be set');
+const { REDIS_URI } = process.env;
+if (!REDIS_URI) {
+    throw new Error('Redis credential not found');
 }
 
-const redis = new Redis(process.env.REDIS_URI);
+const redis = new Redis(REDIS_URI);
 
 export default redis;

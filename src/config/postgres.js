@@ -1,10 +1,11 @@
 import { Sequelize } from 'sequelize';
 
-if (!process.env.POSTGRES_URI) {
-    throw new Error('POSTGRES_URI environment variable must be set');
+const { POSTGRES_URI } = process.env;
+if (!POSTGRES_URI) {
+    throw new Error('Postgres credential not found');
 }
 
-const sequelize = new Sequelize(process.env.POSTGRES_URI, {
+const sequelize = new Sequelize(POSTGRES_URI, {
     dialect: 'postgres',
     dialectOptions: {
         ssl: {

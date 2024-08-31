@@ -9,6 +9,7 @@ import morgan from 'morgan';
 import errorMiddleware from './middleware/error.js';
 import errorHandler from './utils/error-handler.js';
 import authRoutes from './modules/auth/auth.routes.js';
+import verificationRoutes from './modules/auth/verification.routes.js';
 
 const app = express();
 
@@ -32,7 +33,7 @@ app.get(['/', '/api', '/api/v1'], (_req, res) => {
     });
 });
 
-app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth', authRoutes, verificationRoutes);
 
 app.all('*', (req, _res, next) => {
     next(new errorHandler(`Route not found`, 400, `${req.method} ${req.url}`));
@@ -41,4 +42,4 @@ app.all('*', (req, _res, next) => {
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '127.0.0.1', () => console.log(`Server listening on port ${PORT}`));
+app.listen(PORT, '127.0.0.1');
