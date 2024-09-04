@@ -1,28 +1,27 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '../../config/postgres.js';
 
-class OTP extends Model { }
+class Token extends Model { }
 
-OTP.init(
+Token.init(
     {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
         },
-        otp: {
-            type: DataTypes.STRING(6),
+        token: {
+            type: DataTypes.STRING(512),
             allowNull: false,
-            unique: true,
         },
-        purpose: {
-            type: DataTypes.STRING(20),
+        blocked: {
+            type: DataTypes.BOOLEAN,
             allowNull: false,
+            defaultValue: false,
         },
         expiryDateTime: {
             type: DataTypes.DATE,
             allowNull: false,
-            defaultValue: new Date(Date.now() + process.env.OTP_EXPIRES_IN * 1000), // In milliseconds
         },
         userId: {
             type: DataTypes.INTEGER,
@@ -35,11 +34,11 @@ OTP.init(
     },
     {
         sequelize,
-        modelName: 'otp',
+        modelName: 'token',
         freezeTableName: true,
         timestamps: true,
         updatedAt: false,
     },
 );
 
-export default OTP;
+export default Token;

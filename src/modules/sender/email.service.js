@@ -6,11 +6,11 @@ export const sendEmail = async (mailOptions) => {
     return info;
 };
 
-export const sendVerificationEmail = async (email, firstName, otp) => {
+export const sendVerificationEmail = async (email, otp) => {
     const mailOptions = {
         to: email,
         subject: 'E-Learning Account verification',
-        html: accountVerificationTemplate(firstName, otp),
+        html: accountVerificationTemplate(otp),
         tags: [
             {
                 name: "category",

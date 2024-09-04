@@ -9,20 +9,6 @@ export const sendOTPValidation = Joi.object({
             'number.positive': "User ID must be a positive number",
             'any.required': "Please enter the account's id",
         }),
-    firstName: Joi.string()
-        .required()
-        .trim()
-        .min(1)
-        .max(45)
-        .regex(/^[A-Za-z]+$/)
-        .messages({
-            'any.required': 'First name is required',
-            'string.base': 'First name must be a string',
-            'string.empty': 'First name is required',
-            'string.min': 'First name must be between 1-45 characters long',
-            'string.max': 'First name must be between 1-45 characters long',
-            'string.pattern.base': 'First name must only contain letters',
-        }),
     email: Joi.string()
         .required()
         .email()

@@ -1,24 +1,27 @@
-import { verifyToken } from '../modules/auth/token.service.js';
+import { verifyToken, blockToken } from '../modules/auth/token.service.js';
 import redis from "../config/redis.js";
 import errorHandler from '../utils/error-handler.js';
 
 export async function isAuthenticated(req, _res, next) {
-    let accessToken = req.headers["authorization"].split(' ')[1] || req.cookies["accessToken"];
+    const accessToken = req.cookies["accessToken"] ?? req.headers["authorization"]?.split(' ')[1];
+    if (!accessToken) {
+        throw new errorHandler('Please register or login to continue', 401);
+    }
 
-    if (!accessToken)
-        throw new errorHandler('You are not login, Please login to get access', 401);
+    const token = verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
+    if (!token) {
+        await blockToken(token);
+        throw new errorHandler('Token invalid, Please login again', 401);
+    }
 
-    const verifyTokenResult = verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
+    const { exp: decodedExp, user: decodedUser } = token;
 
-    const { userId, exp } = verifyTokenResult.decoded;
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (decodedExp <= currentTime) {
+        throw new errorHandler('Token expired, Please login again', 401);
+    }
 
-    // const currentTime = Math.floor(Date.now() / 1000);
-
-    // // if (exp <= currentTime)
-    // //     updateToken(accessToken, process.env.ACCESS_TOKEN_SECRET, process.env.REFRESH_TOKEN_SECRET);
-
-    const user = await redis.get(userId);
-
+    const user = await redis.get(`user:${decodedUser.id}`);
     req.user = user;
 
     next();
@@ -27,7 +30,7 @@ export async function isAuthenticated(req, _res, next) {
 export function authorizeRoles(...roles) {
     return function (req, _res, next) {
         if (!roles.includes(req.user.role)) {
-            throw new errorHandler('You are not allowed to get access', 403);
+            throw new errorHandler('Access restricted, insufficient permissions', 403);
         }
         next();
     };

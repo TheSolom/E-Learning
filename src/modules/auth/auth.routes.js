@@ -2,28 +2,29 @@ import { Router } from 'express';
 
 import {
     registerValidation,
-    // loginValidation,
+    loginValidation,
     // forgotPasswordValidation,
     // resetPasswordValidation,
 } from './auth.validation.js';
 import {
     register,
-    // login,
-    // refreshLogin,
+    login,
+    refreshLogin,
     // logout,
     // forgotPassword,
     // resetPassword,
 } from './auth.controller.js';
 import validateRequest from '../../middleware/validation.js';
 import { sendVerificationOTP } from './verification.controller.js';
+import { sendLoginTokens } from "./token.controller.js";
 
 const router = Router();
 
 router.post('/register', validateRequest(registerValidation), register, sendVerificationOTP);
 
-// router.post('/login', validateRequest(loginValidation), login);
+router.post('/login', validateRequest(loginValidation), login, sendLoginTokens);
 
-// router.get('/refresh-token', refreshLogin);
+router.post('/refresh', refreshLogin, sendLoginTokens);
 
 // router.post('/logout', logout);
 

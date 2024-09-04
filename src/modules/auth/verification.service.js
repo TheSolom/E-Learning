@@ -67,3 +67,7 @@ export const verifyOTP = async (userId, otp, purpose) => {
         isValid: true
     };
 };
+
+export const removeOTP = async (userId, otp, purpose) => {
+    await OTP.destroy({ where: { userId, otp, purpose } });
+}

@@ -1,11 +1,15 @@
 import { Model, DataTypes } from 'sequelize';
-import sequelize from '../../config/postgres.js';
+import { sequelize } from '../../config/postgres.js';
 import errorHandler from '../../utils/error-handler.js';
-import hashPassword from '../../utils/hash-password.js';
+import { hashPassword, compareHashedPassword } from '../../utils/jwt.js';
 
 class User extends Model {
     getFullName() {
-        return `${this.firstName} ${this.lastName}`;
+        return `${this.dataValues.firstName} ${this.dataValues.lastName}`;
+    }
+
+    async comparePassword(password) {
+        return compareHashedPassword(password, this.dataValues.password);
     }
 }
 
@@ -31,7 +35,6 @@ User.init(
         },
         password: {
             type: DataTypes.STRING(64),
-            allowNull: false,
         },
         photo: {
             type: DataTypes.STRING,
@@ -45,20 +48,21 @@ User.init(
             type: DataTypes.BOOLEAN,
             defaultValue: false,
         },
-        // roleId: {
-        //     type: DataTypes.INTEGER,
-        //     allowNull: false,
-        //     references: {
-        //         model: 'role',
-        //         key: 'id',
-        //     },
-        // },
+        roleId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'role',
+                key: 'id',
+            },
+        },
     },
     {
         sequelize,
         modelName: 'user',
         freezeTableName: true,
         timestamps: true,
+        paranoid: true,
         hooks: {
             beforeCreate: async (user) => {
                 await checkEmailUniqueness(user);
@@ -77,12 +81,10 @@ User.init(
 );
 
 async function checkEmailUniqueness(user) {
-    const existingUser = await User.findOne({ where: { email: user.email } });
+    const existingUser = await User.findOne({ where: { email: user.email }, attributes: ['id'] });
     if (existingUser && existingUser.id !== user.id) {
         throw new errorHandler('Email already in use, please try another one', 400, user.email);
     }
 }
-
-await User.sync({ alter: true });
 
 export default User;
