@@ -6,40 +6,27 @@ import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
 
+import setupRoutes from './utils/routes.js';
+import db from './utils/db.js';
 import errorMiddleware from './middleware/error.js';
-import errorHandler from './utils/error-handler.js';
-import authRoutes from './modules/auth/auth.routes.js';
-import verificationRoutes from './modules/auth/verification.routes.js';
+
+const inProduction = process.env.NODE_ENV === 'production';
 
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
 app.use(cookieParser());
 app.use(cors());
 app.use(helmet());
 app.use(compression());
+app.use(morgan(inProduction ? 'combined' : 'dev'));
 
-if (process.env.NODE_ENV !== "production")
-    app.use(morgan("dev"));
-else
-    app.use(morgan("combined"));
+setupRoutes(app, '/api/v1');
 
-app.get(['/', '/api', '/api/v1'], (_req, res) => {
-    res.status(418).json({
-        message: 'Welcome to E-Learning API V1',
-        repo: 'https://github.com/TheSolom/E-Learning',
-    });
-});
-
-app.use('/api/v1/auth', authRoutes, verificationRoutes);
-
-app.all('*', (req, _res, next) => {
-    next(new errorHandler(`Route not found`, 400, `${req.method} ${req.url}`));
-});
+await db.sequelize.sync({ alter: !inProduction });
 
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '127.0.0.1');
+app.listen(PORT, '127.0.0.1', () => console.log(`Server is running on port ${PORT}`));
