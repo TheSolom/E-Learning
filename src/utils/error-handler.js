@@ -4,7 +4,10 @@ class errorHandler extends Error {
 
         this.name = this.constructor.name;
         this.statusCode = statusCode || 500;
-        if (cause) this.cause = cause;
+        if (cause) {
+            if (!Array.isArray(cause)) cause = [cause];
+            this.cause = cause;
+        }
         this.isOperational = true;
 
         Error.captureStackTrace(this, this.constructor);
