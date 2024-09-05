@@ -7,7 +7,15 @@ export const updateUser = async (userId, userData) => {
         return null;
     }
 
-    const [, [userRow]] = await User.update(userData, { where: { id: userId }, returning: true, });
+    const [, [userRow]] = await User.update(
+        userData,
+        {
+            where: { id: userId },
+            returning: true,
+            individualHooks: true,
+        }
+    );
+
     if (!userRow) {
         return null;
     }
