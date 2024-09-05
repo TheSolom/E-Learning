@@ -1,4 +1,4 @@
-import { verifyToken, blockToken } from '../modules/auth/token.service.js';
+import { verifyToken } from '../modules/auth/token.service.js';
 import redis from "../config/redis.js";
 import errorHandler from '../utils/error-handler.js';
 
@@ -10,17 +10,10 @@ export async function isAuthenticated(req, _res, next) {
 
     const token = verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
     if (!token) {
-        await blockToken(token);
         throw new errorHandler('Token invalid, Please login again', 401);
     }
 
-    const { exp: decodedExp, user: decodedUser } = token;
-
-    const currentTime = Math.floor(Date.now() / 1000);
-    if (decodedExp <= currentTime) {
-        throw new errorHandler('Token expired, Please login again', 401);
-    }
-
+    const { user: decodedUser } = token;
     const user = await redis.get(`user:${decodedUser.id}`);
     req.user = user;
 
