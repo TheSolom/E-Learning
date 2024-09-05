@@ -5,13 +5,13 @@ import convertUtcToLocal from '../../utils/utc-to-local.js';
 export const checkOTPCoolDown = async (userId, purpose) => {
     const COOL_DOWN_PERIOD = 90 * 1000; // 1 minute and 30 seconds in milliseconds
 
-    const otpRow = OTP.findOne({ where: { userId, purpose }, order: [['createdAt', 'DESC']] });
+    const otpRow = await OTP.findOne({ where: { userId, purpose }, order: [['createdAt', 'DESC']] });
 
     if (
         otpRow &&
-        Date.now() - otpRow.createdAt < COOL_DOWN_PERIOD
+        Date.now() - otpRow.dataValues.createdAt < COOL_DOWN_PERIOD
     ) {
-        const timeRemaining = Math.ceil((COOL_DOWN_PERIOD - (Date.now() - otpRow.createdAt)) / 1000);
+        const timeRemaining = Math.ceil((COOL_DOWN_PERIOD - (Date.now() - otpRow.dataValues.createdAt)) / 1000);
         const minutes = Math.floor(timeRemaining / 60);
         const seconds = timeRemaining % 60;
         const remainingTimeString = minutes > 0 ? `${minutes}min ${seconds}s` : `${seconds}s`;
@@ -44,16 +44,16 @@ export const createOTP = async (userId, purpose) => {
 };
 
 export const verifyOTP = async (userId, otp, purpose) => {
-    const otpRow = await OTP.findOne({ where: { userId, otp, purpose }, order: [['createdAt', 'DESC']] });
+    const otpRow = await OTP.findOne({ where: { userId, purpose }, order: [['createdAt', 'DESC']] });
 
-    if (!otpRow) {
+    if (!otpRow || otpRow.dataValues.otp !== otp) {
         return {
             isValid: false,
             cause: 'Invalid OTP'
         };
     }
 
-    const otpExp = new Date(otpRow.expiryDateTime + ' UTC');
+    const otpExp = new Date(otpRow.dataValues.expiryDateTime + ' UTC');
     const currentTimeStamp = convertUtcToLocal(new Date(Date.now()));
 
     if (otpExp < currentTimeStamp) {
@@ -70,4 +70,4 @@ export const verifyOTP = async (userId, otp, purpose) => {
 
 export const removeOTP = async (userId, otp, purpose) => {
     await OTP.destroy({ where: { userId, otp, purpose } });
-}
+};
