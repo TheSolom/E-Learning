@@ -24,7 +24,7 @@ app.use(morgan(inProduction ? 'combined' : 'dev'));
 
 setupRoutes(app, '/api/v1');
 
-await db.sequelize.sync({ alter: !inProduction });
+await db.sequelize.sync(inProduction ? undefined : { alter: { drop: true } });
 
 app.use(errorMiddleware);
 
