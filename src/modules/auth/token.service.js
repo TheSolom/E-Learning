@@ -2,8 +2,8 @@ import jwt from 'jsonwebtoken';
 import Token from './token.model.js';
 import errorHandler from '../../utils/error-handler.js';
 
-export const createToken = (payload, secretKey, expiresInSeconds) => {
-    return jwt.sign(payload, secretKey, { expiresIn: expiresInSeconds });
+export const createToken = (payload, secretKey, expiresIn) => {
+    return jwt.sign(payload, secretKey, { expiresIn });
 };
 
 export const createLoginTokens = async (payload) => {
@@ -14,15 +14,19 @@ export const createLoginTokens = async (payload) => {
         REFRESH_TOKEN_EXPIRES_IN // In seconds
     } = process.env;
 
-    const accessToken = createToken(payload, ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES_IN);
+    const accessToken = createToken(payload, ACCESS_TOKEN_SECRET, parseInt(ACCESS_TOKEN_EXPIRES_IN));
     delete payload.isSecure;
-    const refreshToken = createToken(payload, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_EXPIRES_IN);
+    const refreshToken = createToken(payload, REFRESH_TOKEN_SECRET, parseInt(REFRESH_TOKEN_EXPIRES_IN));
 
     const currentTimestampSeconds = Math.floor(Date.now() / 1000);
     const expiryTimestampSeconds = currentTimestampSeconds + parseInt(REFRESH_TOKEN_EXPIRES_IN);
     const expirationTimeStamp = new Date(expiryTimestampSeconds * 1000);
 
-    await Token.create({ userId: payload.user.id, token: refreshToken, expiryDateTime: expirationTimeStamp });
+    try {
+        await Token.create({ userId: payload.user.id, token: refreshToken, expiryDateTime: expirationTimeStamp });
+    } catch (error) {
+        if (error?.original.code === '23505') return;
+    }
 
     return { accessToken, refreshToken };
 };
@@ -54,9 +58,8 @@ export const validateRefreshToken = async (refreshToken) => {
 };
 
 export const verifyToken = (token, secretKey) => {
-    jwt.verify(token, secretKey, (err, decoded) => {
-        if (err)
-            return null;
+    return jwt.verify(token, secretKey, (err, decoded) => {
+        if (err) return null;
         return decoded;
     });
 };
