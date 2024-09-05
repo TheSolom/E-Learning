@@ -10,7 +10,7 @@ export async function getOrSet(key, callback) {
             } else {
                 callback()
                     .then((data) => {
-                        redis.set(key, JSON.stringify(data));
+                        if (data) redis.set(key, JSON.stringify(data));
                         resolve(data);
                     })
                     .catch((error) => {
