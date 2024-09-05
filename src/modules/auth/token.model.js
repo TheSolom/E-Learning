@@ -13,6 +13,7 @@ Token.init(
         token: {
             type: DataTypes.STRING(512),
             allowNull: false,
+            unique: true,
         },
         blocked: {
             type: DataTypes.BOOLEAN,
