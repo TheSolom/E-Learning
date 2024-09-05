@@ -5,17 +5,17 @@ export const sendOTPValidation = Joi.object({
         .required()
         .positive()
         .messages({
-            'number.base': "Please enter the account's id",
+            'number.base': "Please enter the user's id",
             'number.positive': "User ID must be a positive number",
-            'any.required': "Please enter the account's id",
+            'any.required': "Please enter the user's id",
         }),
     email: Joi.string()
         .required()
         .email()
         .normalize()
         .messages({
-            'any.required': "Please enter the account's email address",
-            'string.email': "Please enter the account's email address",
+            'any.required': "Please enter the user's email address",
+            'string.email': "Please enter the user's email address",
         }),
 });
 
@@ -26,9 +26,9 @@ export const verifyOTPValidation = Joi.object({
         .positive()
         .required()
         .messages({
-            'number.base': "Please enter the account's id",
+            'number.base': "Please enter the user's id",
             'number.positive': "User ID must be a positive number",
-            'any.required': "Please enter the account's id",
+            'any.required': "Please enter the user's id",
         }),
     otp: Joi.string()
         .required()
