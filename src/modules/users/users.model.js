@@ -83,7 +83,7 @@ User.init(
 async function checkEmailUniqueness(user) {
     const existingUser = await User.findOne({ where: { email: user.email }, attributes: ['id'] });
     if (existingUser && existingUser.id !== user.id) {
-        throw new errorHandler('Email already in use, please try another one', 400, user.email);
+        throw new errorHandler('Email already in use, please try another one', 422, user.email);
     }
 }
 
