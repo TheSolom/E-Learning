@@ -20,9 +20,9 @@ export async function isAuthenticated(req, _res, next) {
     next();
 };
 
-export function authorizeRoles(...roles) {
+export function authorizeRoles(...rolesIds) {
     return function (req, _res, next) {
-        if (!roles.includes(req.user.role)) {
+        if (!rolesIds.includes(req.user.roleId)) {
             throw new errorHandler('Access restricted, insufficient permissions', 403);
         }
         next();
