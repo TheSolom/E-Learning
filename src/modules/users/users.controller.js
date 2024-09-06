@@ -4,6 +4,9 @@ import { getOrSet } from '../../utils/cache.js';
 
 export async function getUser(req, res, _next) {
     const { userId } = req.params;
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required' });
+    }
 
     try {
         const userWithoutPassword = await getOrSet(
