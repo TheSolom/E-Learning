@@ -10,7 +10,7 @@ import {
     register,
     login,
     refreshLogin,
-    // logout,
+    logout,
     // forgotPassword,
     // resetPassword,
 } from './auth.controller.js';
@@ -26,7 +26,7 @@ router.post('/login', validateRequest(loginValidation), login, sendLoginTokens);
 
 router.post('/refresh', refreshLogin, sendLoginTokens);
 
-// router.post('/logout', logout);
+router.post('/logout', logout);
 
 // router.post('/forgot-password', validateRequest(forgotPasswordValidation), forgotPassword);
 

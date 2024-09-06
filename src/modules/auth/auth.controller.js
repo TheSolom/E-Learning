@@ -1,6 +1,6 @@
 import * as authService from "./auth.service.js";
-import { createLoginTokens, validateRefreshToken } from './token.service.js';
-import { set } from '../../utils/cache.js';
+import { createLoginTokens, validateRefreshToken, verifyToken, blockToken } from './token.service.js';
+import { set, remove } from '../../utils/cache.js';
 
 export async function register(req, _res, next) {
     const { body: userData } = req;
@@ -54,9 +54,13 @@ export async function refreshLogin(req, res, next) {
         });
     }
 
-    const { user: decodedUser } = await validateRefreshToken(refreshToken);
+    const decodedToken = await validateRefreshToken(refreshToken);
+    if (!decodedToken)
+        return res.status(401).json({
+            message: 'Token invalid, please login again',
+        });
 
-    const { id, email, isVerified, roleId } = decodedUser;
+    const { id, email, isVerified, roleId } = decodedToken.user;
 
     const {
         accessToken: newAccessToken,
@@ -77,4 +81,38 @@ export async function refreshLogin(req, res, next) {
     req.refreshToken = newRefreshToken;
 
     next();
+}
+
+export async function logout(req, res, _next) {
+    const { refreshToken } = req.cookies ?? req.body;
+    if (!refreshToken) {
+        return res.status(401).json({
+            message: 'Token invalid',
+        });
+    }
+
+    const decodedToken = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    if (!decodedToken) {
+        return res.status(401).json({
+            message: 'Token invalid',
+        });
+    }
+
+    await Promise.all([
+        blockToken(refreshToken),
+        remove(`user:${decodedToken.user.id}`)
+    ]);
+
+    const cookieOption = {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: (process.env.NODE_ENV === "production" ? true : false),
+    };
+
+    res
+        .clearCookie('refreshToken', cookieOption)
+        .clearCookie('accessToken', cookieOption)
+        .status(200).json({
+            message: 'Logged out successfully'
+        });
 }
