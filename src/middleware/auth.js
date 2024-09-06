@@ -13,9 +13,9 @@ export async function isAuthenticated(req, _res, next) {
         throw new errorHandler('Token invalid, Please login again', 401);
     }
 
-    const { user: decodedUser } = token;
+    const { user: decodedUser, isSecure } = token;
     const user = await redis.get(`user:${decodedUser.id}`);
-    req.user = user;
+    req.user = { ...user, isSecure };
 
     next();
 };
