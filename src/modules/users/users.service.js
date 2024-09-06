@@ -15,14 +15,11 @@ export const updateUser = async (userId, userData) => {
             individualHooks: true,
         }
     );
-
     if (!userRow) {
         return null;
     }
 
     const { password, ...userWithoutPassword } = userRow.dataValues;
-
     await set(`user:${userId}`, userWithoutPassword);
-
     return userWithoutPassword;
 };
