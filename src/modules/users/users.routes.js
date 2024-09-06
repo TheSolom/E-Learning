@@ -8,12 +8,12 @@ import {
     updateUserValidation,
 } from './users.validation.js';
 import validateRequest from '../../middleware/validation.js';
-import { isAuthenticated } from '../../middleware/auth.js';
+import { isAuthenticated, isSameUserOrAdmin } from '../../middleware/auth.js';
 
 const router = Router();
 
 router.get('/:userId/profile', getUser);
 
-router.patch('/:userId/profile', isAuthenticated, validateRequest(updateUserValidation), updateUser);
+router.patch('/:userId/profile', isAuthenticated, isSameUserOrAdmin, validateRequest(updateUserValidation), updateUser);
 
 export default router;
