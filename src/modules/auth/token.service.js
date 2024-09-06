@@ -1,6 +1,9 @@
 import jwt from 'jsonwebtoken';
 import Token from './token.model.js';
-import errorHandler from '../../utils/error-handler.js';
+
+export const verifyToken = (token, secretKey) => {
+    return jwt.verify(token, secretKey, (err, decoded) => err ? null : decoded);
+};
 
 export const createToken = (payload, secretKey, expiresIn) => {
     return jwt.sign(payload, secretKey, { expiresIn });
@@ -31,43 +34,11 @@ export const createLoginTokens = async (payload) => {
     return { accessToken, refreshToken };
 };
 
-export const validateRefreshToken = async (refreshToken) => {
-    const token = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    if (!token) {
-        await blockToken(token);
-        throw new errorHandler('Token invalid, Please login again', 401);
-    }
-
-    const { exp: decodedExp, user: decodedUser } = token;
-
-    const currentTime = Math.floor(Date.now() / 1000);
-    if (decodedExp <= currentTime) {
-        throw new errorHandler('Token expired, Please login again', 401);
-    }
-
-    const storedToken = await getToken(refreshToken);
-    if (!storedToken || storedToken.blocked) {
-        throw new errorHandler('Token invalid, Please login again', 401);
-    }
-    if (storedToken.userId !== decodedUser.id) {
-        await blockToken(token);
-        throw new errorHandler('Token invalid, Please login again', 401);
-    }
-
-    return token;
-};
-
-export const verifyToken = (token, secretKey) => {
-    return jwt.verify(token, secretKey, (err, decoded) => {
-        if (err) return null;
-        return decoded;
-    });
-};
-
 export const getToken = async (token) => {
     const tokenRow = await Token.findOne({ token });
-    if (!tokenRow)
+    if (!tokenRow) {
         return null;
+    }
 
     return tokenRow.dataValues;
 };
@@ -79,4 +50,23 @@ export const blockToken = async (token) => {
     }
 
     return tokenRow.dataValues;
+};
+
+export const validateRefreshToken = async (refreshToken) => {
+    const decodedToken = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    if (!decodedToken) {
+        await blockToken(refreshToken);
+        return null;
+    }
+
+    const storedToken = await getToken(refreshToken);
+    if (!storedToken || storedToken.blocked) {
+        return null;
+    }
+    if (storedToken.userId !== decodedToken.user.id) {
+        await blockToken(refreshToken);
+        return null;
+    }
+
+    return decodedToken;
 };
