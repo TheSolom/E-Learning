@@ -24,11 +24,17 @@ export const updateUserValidation = Joi.object({
             'string.pattern.base': 'Last name must only contain letters',
         }),
     email: Joi.string()
-        .email()
-        .normalize()
+        .forbidden()
         .messages({
-            'string.email': 'Email must be a valid email',
+            'any.unknown': 'Email cannot be changed',
         }),
+    oldPassword: Joi.when('password', {
+        is: Joi.exist(),
+        then: Joi.string().required().messages({
+            'any.required': 'Old password is required when setting a new password',
+        }),
+        otherwise: Joi.forbidden(),
+    }),
     password: Joi.string()
         .trim()
         .min(8)
