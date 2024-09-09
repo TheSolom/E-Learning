@@ -37,7 +37,7 @@ export async function login(req, res, next) {
                 isSecure: true
             },
         ),
-        set(`user:${userWithoutPassword.id}`, JSON.stringify(userWithoutPassword)),
+        set(`user:${userWithoutPassword.id}`, userWithoutPassword),
     ]);
 
     req.accessToken = newAccessToken;
