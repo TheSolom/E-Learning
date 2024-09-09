@@ -29,6 +29,10 @@ export async function set(key, value) {
     await redis.set(key, JSON.stringify(value));
 }
 
+export async function setTemp(key, value, seconds) {
+    await redis.set(key, JSON.stringify(value), "EX", seconds);
+}
+
 export async function remove(key) {
     await redis.del(key);
 }
