@@ -37,3 +37,15 @@ export async function updateUser(req, res, _next) {
 
     res.status(200).json({ user: userWithoutPassword });
 }
+
+export async function deleteUser(req, res, _next) {
+    const { userId: deletedUserId } = req.params;
+    const { body: { id: userId, password } } = req;
+
+    const isDeleted = await userService.deleteUser(userId, password, deletedUserId);
+    if (!isDeleted) {
+        return res.status(400).json({ message: 'Password is incorrect' });
+    }
+
+    res.status(204).json();
+}

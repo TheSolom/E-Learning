@@ -53,8 +53,28 @@ export const updateUserValidation = Joi.object({
             .required()
             .messages({
                 'any.required': 'Confirm password is required',
+                'string.base': 'Confirm password must be a string',
                 'any.only': 'Password does not match with the confirm password',
             }),
         otherwise: Joi.forbidden(),
     }),
+});
+
+export const deleteUserValidation = Joi.object({
+    id: Joi.number()
+        .required()
+        .positive()
+        .messages({
+            'any.required': "User's id is required",
+            'number.base': "User's id must be a number",
+            'number.positive': "User's id must be a positive number",
+        }),
+    password: Joi.string()
+        .required()
+        .trim()
+        .messages({
+            'any.required': 'Password is required',
+            'string.base': 'Password must be a string',
+            'string.empty': 'You must type a password',
+        }),
 });
