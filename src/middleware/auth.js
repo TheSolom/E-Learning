@@ -6,7 +6,7 @@ import roles from '../modules/users/roles.enum.js';
 export async function isAuthenticated(req, _res, next) {
     const accessToken = req.cookies["accessToken"] ?? req.headers["authorization"]?.split(' ')[1];
     if (!accessToken) {
-        throw new errorHandler('Please register or login to continue', 401);
+        throw new errorHandler('Please login to continue', 401);
     }
 
     const token = verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
