@@ -40,7 +40,7 @@ export async function updateUser(req, res, _next) {
 
 export async function deleteUser(req, res, _next) {
     const { userId: deletedUserId } = req.params;
-    const { body: { id: userId, password } } = req;
+    const { body: { userId, password } } = req;
 
     const isDeleted = await userService.deleteUser(userId, password, deletedUserId);
     if (!isDeleted) {

@@ -61,7 +61,7 @@ export const updateUserValidation = Joi.object({
 });
 
 export const deleteUserValidation = Joi.object({
-    id: Joi.number()
+    userId: Joi.number()
         .required()
         .positive()
         .messages({
