@@ -62,7 +62,6 @@ User.init(
         modelName: 'user',
         freezeTableName: true,
         timestamps: true,
-        paranoid: true,
         hooks: {
             beforeCreate: async (user) => {
                 await checkEmailUniqueness(user);
@@ -81,8 +80,8 @@ User.init(
 );
 
 async function checkEmailUniqueness(user) {
-    const existingUser = await User.findOne({ where: { email: user.email }, attributes: ['id'] });
-    if (existingUser && existingUser.id !== user.id) {
+    const existingUser = await User.findOne({ where: { email: user.dataValues.email }, attributes: ['id'] });
+    if (existingUser && existingUser.dataValues.id !== user.dataValues.id) {
         throw new errorHandler('Email already in use, please try another one', 422, user.email);
     }
 }
