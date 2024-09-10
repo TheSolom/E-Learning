@@ -1,21 +1,30 @@
 import User from './users.model.js';
-import { get, set, remove } from '../../utils/cache.js';
+import { getOrSet, set, remove } from '../../utils/cache.js';
+
+export const findUser = async (identifier) => {
+    if (typeof identifier === 'string' || typeof identifier === 'number') {
+        const userWithoutPassword = await getOrSet(
+            `user:${identifier}`,
+            async () => {
+                const userRow = await User.findByPk(identifier, { attributes: { exclude: ['password'] } });
+                return userRow?.dataValues;
+            }
+        );
+        return userWithoutPassword;
+    } else if (typeof identifier === 'object') {
+        const user = await User.findOne({ where: identifier });
+        return user?.dataValues;
+    }
+
+    return null;
+};
 
 export const updateUser = async (userId, userData) => {
-    let user = await get(`user:${userId}`);
+    const user = await User.findByPk(userId);
     if (!user) return null;
 
-    const [, [userRow]] = await User.update(
-        userData,
-        {
-            where: { id: userId },
-            returning: true,
-            individualHooks: true,
-        }
-    );
-    if (!userRow) return null;
+    const { dataValues: { password, ...userWithoutPassword } } = await user.update(userData);
 
-    const { password, ...userWithoutPassword } = userRow.dataValues;
     await set(`user:${userId}`, userWithoutPassword);
 
     return userWithoutPassword;
