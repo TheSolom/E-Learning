@@ -1,6 +1,6 @@
 import errorHandler from './error-handler.js';
 import authRoutes from '../modules/auth/auth.routes.js';
-import verificationRoutes from '../modules/auth/verification.routes.js';
+import verificationRoutes from '../modules/verification/verification.routes.js';
 import userRoutes from '../modules/users/users.routes.js';
 
 const setupRoutes = (app, prefix = '') => {
@@ -11,7 +11,8 @@ const setupRoutes = (app, prefix = '') => {
         });
     });
 
-    app.use(`${prefix}/auth`, authRoutes, verificationRoutes);
+    app.use(`${prefix}/auth`, authRoutes);
+    app.use(`${prefix}/verification`, verificationRoutes);
     app.use(`${prefix}/users`, userRoutes);
 
     app.all('*', (req, _res, next) => {

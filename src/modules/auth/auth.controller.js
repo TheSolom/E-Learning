@@ -1,14 +1,17 @@
 import * as authService from "./auth.service.js";
 import { createLoginTokens, validateRefreshToken, verifyToken, blockToken } from './token.service.js';
+import { findUser, updateUser } from '../users/users.service.js';
 import { set, remove } from '../../utils/cache.js';
+import { VerificationPurpose } from '../verification/verification.enum.js';
+import { sendOTP } from '../verification/verification.controller.js';
 
-export async function register(req, _res, next) {
+export async function register(req, res, next) {
     const { body: userData } = req;
 
-    const userWithoutPassword = await authService.registerUser(userData);
-    req.user = userWithoutPassword;
+    const { id: userId, email } = await authService.registerUser(userData);
 
-    next();
+    req.body = { userId, email, purpose: VerificationPurpose.EMAIL_VERIFICATION };
+    await sendOTP(req, res, next);
 }
 
 export async function login(req, res, next) {
@@ -18,8 +21,11 @@ export async function login(req, res, next) {
 
     if (!userWithoutPassword.isVerified) {
         return res.status(403).json({
-            message: "User not verified. Please check your email",
-            user: userWithoutPassword
+            message: "User not verified. please verify your email",
+            user: {
+                id: userWithoutPassword.id,
+                email: userWithoutPassword.email
+            }
         });
     }
 
@@ -115,4 +121,33 @@ export async function logout(req, res, _next) {
         .status(200).json({
             message: 'Logged out successfully'
         });
+}
+
+export async function forgotPassword(req, res, next) {
+    const { email } = req.body;
+
+    const user = await findUser({ email });
+    if (!user) {
+        return res.status(404).json({
+            message: 'User not found'
+        });
+    }
+
+    req.body = { userId: user.id, email, purpose: VerificationPurpose.PASSWORD_RESET };
+    await sendOTP(req, res, next);
+}
+
+export async function resetPassword(req, res, _next) {
+    const { userId, password } = req.body;
+
+    const userWithoutPassword = await updateUser(userId, password);
+    if (!userWithoutPassword) {
+        return res.status(404).json({
+            message: 'User not found'
+        });
+    }
+
+    res.status(200).json({
+        message: 'Password reset successfully'
+    });
 }

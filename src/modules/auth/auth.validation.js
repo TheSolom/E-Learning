@@ -78,3 +78,46 @@ export const loginValidation = Joi.object({
             'string.empty': 'You must type a password',
         }),
 });
+
+export const forgotPasswordValidation = Joi.object({
+    email: Joi.string()
+        .required()
+        .email()
+        .normalize()
+        .messages({
+            'any.required': 'Email is required',
+            'string.email': 'Email must be a valid email',
+        }),
+});
+
+export const resetPasswordValidation = Joi.object({
+    id: Joi.number()
+        .required()
+        .positive()
+        .messages({
+            'number.base': "Please enter the user's id",
+            'number.positive': "User ID must be a positive number",
+            'any.required': "Please enter the user's id",
+        }),
+    password: Joi.string()
+        .required()
+        .trim()
+        .min(8)
+        .max(64)
+        .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/)
+        .messages({
+            'any.required': 'Password is required',
+            'string.base': 'Password must be a string',
+            'string.empty': 'You must type a password',
+            'string.min': 'Password must be 8 to 64 characters long',
+            'string.max': 'Password must be 8 to 64 characters long',
+            'string.pattern.base': 'Password must contain at least one letter, one number and one special character',
+        }),
+    confirmPassword: Joi.any()
+        .required()
+        .valid(Joi.ref('password'))
+        .messages({
+            'any.required': 'Confirm password is required',
+            'any.only': 'Password does not match with the confirm password'
+        }),
+});

@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
 export const sendOTPValidation = Joi.object({
-    id: Joi.number()
+    userId: Joi.number()
         .required()
         .positive()
         .messages({
@@ -19,10 +19,8 @@ export const sendOTPValidation = Joi.object({
         }),
 });
 
-export const send2FAValidation = Joi.object({});
-
 export const verifyOTPValidation = Joi.object({
-    id: Joi.number()
+    userId: Joi.number()
         .positive()
         .required()
         .messages({
@@ -43,7 +41,7 @@ export const verifyOTPValidation = Joi.object({
     purpose: Joi.string()
         .required()
         .trim()
-        .valid('email_verification', '2fa_verification')
+        .valid('email_verification', 'password_reset')
         .messages({
             'any.required': 'Please enter the purpose of the OTP',
             'any.only': 'Invalid purpose',
