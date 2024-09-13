@@ -6,7 +6,7 @@ export async function getUser(req, res, _next) {
         return res.status(400).json({ message: 'User ID param is required' });
     }
 
-    const userWithoutPassword = await userService.findUser(userId);
+    const userWithoutPassword = await userService.getUser(userId);
     if (!userWithoutPassword) {
         return res.status(404).json({ message: 'User not found' });
     }

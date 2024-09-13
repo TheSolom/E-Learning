@@ -1,7 +1,7 @@
 import User from './users.model.js';
 import { getOrSet, set, remove } from '../../utils/cache.js';
 
-export const findUser = async (identifier) => {
+export const getUser = async (identifier) => {
     if (typeof identifier === 'string' || typeof identifier === 'number') {
         const userWithoutPassword = await getOrSet(
             `user:${identifier}`,
@@ -10,10 +10,11 @@ export const findUser = async (identifier) => {
                 return userRow?.dataValues;
             }
         );
+
         return userWithoutPassword;
     } else if (typeof identifier === 'object') {
-        const user = await User.findOne({ where: identifier });
-        return user?.dataValues;
+        const userWithoutPassword = await User.findOne({ where: identifier, attributes: { exclude: ['password'] } });
+        return userWithoutPassword?.dataValues;
     }
 
     return null;
