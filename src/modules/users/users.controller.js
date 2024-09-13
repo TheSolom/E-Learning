@@ -2,9 +2,6 @@ import * as userService from './users.service.js';
 
 export async function getUser(req, res, _next) {
     const { userId } = req.params;
-    if (!userId) {
-        return res.status(400).json({ message: 'User ID param is required' });
-    }
 
     const userWithoutPassword = await userService.getUser(userId);
     if (!userWithoutPassword) {
@@ -17,9 +14,6 @@ export async function getUser(req, res, _next) {
 export async function updateUser(req, res, _next) {
     const { userId } = req.params;
     const { body: userData } = req;
-    if (!userId) {
-        return res.status(400).json({ message: 'User ID param is required' });
-    }
 
     const userWithoutPassword = await userService.updateUser(userId, userData);
     if (!userWithoutPassword) {
@@ -32,9 +26,6 @@ export async function updateUser(req, res, _next) {
 export async function deleteUser(req, res, _next) {
     const { userId: deletedUserId } = req.params;
     const { body: { userId, password } } = req;
-    if (!deletedUserId) {
-        return res.status(400).json({ message: 'User ID param is required' });
-    }
 
     const isDeleted = await userService.deleteUser(userId, password, deletedUserId);
     if (!isDeleted) {

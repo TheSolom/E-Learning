@@ -6,18 +6,36 @@ import {
     deleteUser,
 } from './users.controller.js';
 import {
-    updateUserValidation,
-    deleteUserValidation
+    getUserParamsValidation,
+    updateUserParamsValidation,
+    updateUserBodyValidation,
+    deleteUserParamsValidation,
+    deleteUserBodyValidation,
 } from './users.validation.js';
 import validateRequest from '../../middleware/validation.js';
 import { isAuthenticated, isSameUserOrAdmin } from '../../middleware/auth.js';
 
 const router = Router();
 
-router.get('/:userId/profile', getUser);
+router.get('/:userId/profile', validateRequest({ params: getUserParamsValidation }), getUser);
 
-router.patch('/:userId/profile', isAuthenticated, isSameUserOrAdmin, validateRequest(updateUserValidation), updateUser);
+router.patch('/:userId/profile',
+    isAuthenticated,
+    isSameUserOrAdmin,
+    validateRequest({
+        params: updateUserParamsValidation,
+        body: updateUserBodyValidation
+    }),
+    updateUser);
 
-router.delete('/:userId', isAuthenticated, isSameUserOrAdmin, validateRequest(deleteUserValidation), deleteUser);
+router.delete('/:userId',
+    isAuthenticated,
+    isSameUserOrAdmin,
+    validateRequest({
+        params: deleteUserParamsValidation,
+        body: deleteUserBodyValidation
+    }),
+    deleteUser
+);
 
 export default router;

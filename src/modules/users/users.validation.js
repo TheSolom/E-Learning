@@ -1,6 +1,32 @@
 import Joi from 'joi';
 
-export const updateUserValidation = Joi.object({
+export const getUserParamsValidation = Joi.object({
+    userId: Joi.number()
+        .required()
+        .integer()
+        .positive()
+        .messages({
+            'any.required': "User's id is required",
+            'number.base': "User's id must be a number",
+            'number.integer': "User's id must be an integer",
+            'number.positive': "User's id must be a positive number",
+        }),
+});
+
+export const updateUserParamsValidation = Joi.object({
+    userId: Joi.number()
+        .required()
+        .integer()
+        .positive()
+        .messages({
+            'any.required': "User's id is required",
+            'number.base': "User's id must be a number",
+            'number.integer': "User's id must be an integer",
+            'number.positive': "User's id must be a positive number",
+        }),
+});
+
+export const updateUserBodyValidation = Joi.object({
     firstName: Joi.string()
         .trim()
         .min(1)
@@ -60,7 +86,20 @@ export const updateUserValidation = Joi.object({
     }),
 });
 
-export const deleteUserValidation = Joi.object({
+export const deleteUserParamsValidation = Joi.object({
+    userId: Joi.number()
+        .required()
+        .integer()
+        .positive()
+        .messages({
+            'any.required': "User's id is required",
+            'number.base': "User's id must be a number",
+            'number.integer': "User's id must be an integer",
+            'number.positive': "User's id must be a positive number",
+        }),
+});
+
+export const deleteUserBodyValidation = Joi.object({
     userId: Joi.number()
         .required()
         .positive()
