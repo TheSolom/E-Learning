@@ -1,37 +1,41 @@
-import errorHandler from "../utils/error-handler.js";
+import ErrorHandler from "../utils/error.handler.js";
 
-const sendErrorForDev = (error, res) => {
-    return res.status(error.statusCode).json({
-        error: error,
-        message: error.message,
-        cause: error.cause,
-        stack: error.stack,
-    });
+const extractSequelizeForeignKey = (errorMessage) => {
+    const start = errorMessage.indexOf('(') + 1;
+    const end = errorMessage.indexOf(')', start);
+    return errorMessage.substring(start, end);
 };
 
-const sendErrorForProd = (error, res) => {
-    return res.status(error.statusCode).json({
+const handleSequelizeErrors = (error) => {
+    switch (error.name) {
+        case 'SequelizeUniqueConstraintError':
+        case 'SequelizeValidationError':
+            return new ErrorHandler('Validation failed', 400, error.errors[0].message);
+        case 'SequelizeForeignKeyConstraintError': {
+            const foreignKey = extractSequelizeForeignKey(error.parent.detail);
+            return new ErrorHandler('Validation failed', 409, `Invalid ${foreignKey}`);
+        }
+        default:
+            return error;
+    }
+};
+const sendError = (error, res, isProduction = false) => {
+    const response = {
         message: error.message,
-        cause: error.cause
-    });
+        ...(isProduction ? { cause: error.cause } : { error: { ...error, stack: error.stack } })
+    };
+
+    return res.status(error.statusCode).json(response);
 };
 
 const errorMiddleware = (error, _req, res, _next) => {
     error.statusCode = error.statusCode || 500;
     error.message = error.message || 'Internal server error';
 
-    if (error?.original?.code === '23505') {
-        error = new errorHandler('Duplicate value error', 400, error.original.detail);
-    }
-    if (error?.original?.code === '23500') {
-        error = new errorHandler('Constraint violation error', 409, error.original.detail);
-    }
+    error = handleSequelizeErrors(error);
 
-    if (process.env.NODE_ENV === 'development') {
-        sendErrorForDev(error, res);
-    } else {
-        sendErrorForProd(error, res);
-    }
+    const isProduction = process.env.NODE_ENV === 'production';
+    sendError(error, res, isProduction);
 };
 
 export default errorMiddleware;
