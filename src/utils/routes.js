@@ -1,7 +1,9 @@
-import errorHandler from './error-handler.js';
+import ErrorHandler from './error.handler.js';
 import authRoutes from '../modules/auth/auth.routes.js';
 import verificationRoutes from '../modules/verification/verification.routes.js';
-import userRoutes from '../modules/users/users.routes.js';
+import userRoutes from '../modules/user/user.routes.js';
+import userRoleRoutes from '../modules/user/user-role.routes.js';
+import roleRoutes from '../modules/user/role.routes.js';
 
 const setupRoutes = (app, prefix = '') => {
     app.get([prefix, '/', '/api', '/api/v1'], (_req, res, _next) => {
@@ -13,10 +15,11 @@ const setupRoutes = (app, prefix = '') => {
 
     app.use(`${prefix}/auth`, authRoutes);
     app.use(`${prefix}/verification`, verificationRoutes);
-    app.use(`${prefix}/users`, userRoutes);
+    app.use(`${prefix}/users`, userRoutes, userRoleRoutes);
+    app.use(`${prefix}/roles`, roleRoutes);
 
     app.all('*', (req, _res, next) => {
-        next(new errorHandler(`Route not found`, 400, `${req.method} ${req.url}`));
+        next(new ErrorHandler(`Route not found`, 400, `${req.method} ${req.url}`));
     });
 };
 

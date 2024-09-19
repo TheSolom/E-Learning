@@ -7,7 +7,7 @@ import compression from 'compression';
 import morgan from 'morgan';
 
 import setupRoutes from './utils/routes.js';
-import db from './utils/db.js';
+import PostgresDatabase from './utils/db.js';
 import errorMiddleware from './middleware/error.js';
 
 const inProduction = process.env.NODE_ENV === 'production';
@@ -24,9 +24,10 @@ app.use(morgan(inProduction ? 'combined' : 'dev'));
 
 setupRoutes(app, '/api/v1');
 
-await db.sequelize.sync(inProduction ? undefined : { alter: { drop: true } });
+const db = PostgresDatabase.getInstance(inProduction);
+await db.initialize();
 
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '127.0.0.1', () => console.log(`Server is running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
