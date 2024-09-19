@@ -1,6 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '../../config/postgres.js';
-import errorHandler from '../../utils/error-handler.js';
+import ErrorHandler from '../../utils/error.handler.js';
 import { hashPassword, compareHashedPassword } from '../../utils/jwt.js';
 
 class User extends Model {
@@ -48,14 +48,6 @@ User.init(
             type: DataTypes.BOOLEAN,
             defaultValue: false,
         },
-        roleId: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            references: {
-                model: 'role',
-                key: 'id',
-            },
-        },
     },
     {
         sequelize,
@@ -82,7 +74,7 @@ User.init(
 async function checkEmailUniqueness(user) {
     const existingUser = await User.findOne({ where: { email: user.dataValues.email }, attributes: ['id'] });
     if (existingUser && existingUser.dataValues.id !== user.dataValues.id) {
-        throw new errorHandler('Email already in use, please try another one', 422, user.email);
+        throw new ErrorHandler('Email already in use, please try another one', 422, user.email);
     }
 }
 
