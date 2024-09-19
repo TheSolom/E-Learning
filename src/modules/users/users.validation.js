@@ -13,6 +13,16 @@ export const getUserParamsValidation = Joi.object({
         }),
 });
 
+export const getUsersQueryValidation = Joi.object({
+    page: Joi.number().integer().min(1).default(1),
+    limit: Joi.number().integer().min(1).max(100).default(10),
+    sort: Joi.string().valid('firstName', 'createdAt').default('createdAt'),
+    order: Joi.string().valid('asc', 'desc').default('desc'),
+    search: Joi.string().optional().trim(),
+    roleId: Joi.number().optional().integer().positive(),
+    languageId: Joi.number().optional().integer().positive()
+});
+
 export const updateUserParamsValidation = Joi.object({
     userId: Joi.number()
         .required()
@@ -86,6 +96,16 @@ export const updateUserBodyValidation = Joi.object({
     }),
 });
 
+export const deleteUserHeadersValidation = Joi.object({
+    'x-password': Joi.string()
+        .required()
+        .messages({
+            'any.required': "Password is required",
+            'string.base': "Password must be a string",
+            'string.empty': "Password must not be empty",
+        }),
+}).unknown(true);
+
 export const deleteUserParamsValidation = Joi.object({
     userId: Joi.number()
         .required()
@@ -96,24 +116,5 @@ export const deleteUserParamsValidation = Joi.object({
             'number.base': "User's id must be a number",
             'number.integer': "User's id must be an integer",
             'number.positive': "User's id must be a positive number",
-        }),
-});
-
-export const deleteUserBodyValidation = Joi.object({
-    userId: Joi.number()
-        .required()
-        .positive()
-        .messages({
-            'any.required': "User's id is required",
-            'number.base': "User's id must be a number",
-            'number.positive': "User's id must be a positive number",
-        }),
-    password: Joi.string()
-        .required()
-        .trim()
-        .messages({
-            'any.required': 'Password is required',
-            'string.base': 'Password must be a string',
-            'string.empty': 'You must type a password',
         }),
 });
