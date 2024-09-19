@@ -2,15 +2,17 @@ import { Router } from 'express';
 
 import {
     getUser,
+    getUsers,
     updateUser,
     deleteUser,
 } from './users.controller.js';
 import {
     getUserParamsValidation,
+    getUsersQueryValidation,
     updateUserParamsValidation,
     updateUserBodyValidation,
+    deleteUserHeadersValidation,
     deleteUserParamsValidation,
-    deleteUserBodyValidation,
 } from './users.validation.js';
 import validateRequest from '../../middleware/validation.js';
 import { isAuthenticated, isSameUserOrAdmin } from '../../middleware/auth.js';
@@ -18,6 +20,8 @@ import { isAuthenticated, isSameUserOrAdmin } from '../../middleware/auth.js';
 const router = Router();
 
 router.get('/:userId/profile', validateRequest({ params: getUserParamsValidation }), getUser);
+
+router.get('/', validateRequest({ query: getUsersQueryValidation }), getUsers);
 
 router.patch('/:userId/profile',
     isAuthenticated,
@@ -32,8 +36,8 @@ router.delete('/:userId',
     isAuthenticated,
     isSameUserOrAdmin,
     validateRequest({
+        headers: deleteUserHeadersValidation,
         params: deleteUserParamsValidation,
-        body: deleteUserBodyValidation
     }),
     deleteUser
 );
