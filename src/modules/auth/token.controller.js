@@ -1,4 +1,4 @@
-export function sendLoginTokens(req, res, _next) {
+export function setLoginTokens(req, res, _next) {
     const { ACCESS_TOKEN_EXPIRES_IN, REFRESH_TOKEN_EXPIRES_IN, NODE_ENV } = process.env;
 
     const accessTokenOptions = {
@@ -17,7 +17,7 @@ export function sendLoginTokens(req, res, _next) {
         secure: (NODE_ENV === "production" ? true : false),
     };
 
-    const { accessToken, refreshToken } = req;
+    const { body: { accessToken, refreshToken } } = req;
 
     res.cookie("accessToken", accessToken, accessTokenOptions);
     res.cookie("refreshToken", refreshToken, refreshTokenOptions);

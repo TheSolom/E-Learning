@@ -15,15 +15,15 @@ import {
     resetPassword,
 } from './auth.controller.js';
 import validateRequest from '../../middleware/validation.js';
-import { sendLoginTokens } from "./token.controller.js";
+import { setLoginTokens } from "./token.controller.js";
 
 const router = Router();
 
 router.post('/register', validateRequest(registerValidation), register);
 
-router.post('/login', validateRequest(loginValidation), login, sendLoginTokens);
+router.post('/login', validateRequest(loginValidation), login, setLoginTokens);
 
-router.post('/refresh', refreshLogin, sendLoginTokens);
+router.post('/refresh', refreshLogin, setLoginTokens);
 
 router.post('/logout', logout);
 
