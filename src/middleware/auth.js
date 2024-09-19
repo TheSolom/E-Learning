@@ -1,21 +1,18 @@
 import { verifyToken } from '../modules/auth/token.service.js';
+import ErrorHandler from '../utils/error.handler.js';
 import { get } from '../utils/cache.js';
-import errorHandler from '../utils/error-handler.js';
-import roles from '../modules/users/roles.enum.js';
+import Role from '../modules/user/role.enum.js';
 
 export async function isAuthenticated(req, _res, next) {
     const accessToken = req.cookies["accessToken"] ?? req.headers["authorization"]?.split(' ')[1];
     if (!accessToken) {
-        throw new errorHandler('Please login to continue', 401);
+        throw new ErrorHandler('Please login to continue', 401);
     }
 
-    const token = verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
-    if (!token) {
-        throw new errorHandler('Token invalid, Please login again', 401);
-    }
+    const { user: decodedUser, isSecure } = verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
 
-    const { user: decodedUser, isSecure } = token;
     const user = await get(`user:${decodedUser.id}`);
+
     req.user = { ...user, isSecure };
 
     next();
@@ -23,26 +20,22 @@ export async function isAuthenticated(req, _res, next) {
 
 export function authorizeRoles(...rolesIds) {
     return function (req, _res, next) {
-        if (!rolesIds.includes(req.user.roleId)) {
-            throw new errorHandler('Access restricted, insufficient permissions', 403);
+        if (!req?.user.roles.some(role => rolesIds.includes(role.id))) {
+            throw new ErrorHandler('Access restricted, insufficient permissions', 403);
         }
+
         next();
     };
 };
 
 export function isSameUserOrAdmin(req, _res, next) {
-    const { userId } = req.params;
+    const { params: { userId } } = req;
     if (!userId) {
-        throw new errorHandler('User ID is required', 400);
+        throw new ErrorHandler('User ID is required', 400);
     }
-    if (
-        parseInt(userId) !== req?.user.id &&
-        (
-            req.user.roleId !== roles.ADMIN ||
-            req.user.roleId !== roles.SUPER_ADMIN
-        )
-    ) {
-        throw new errorHandler('Access restricted, insufficient permissions', 403);
+
+    if (parseInt(userId) !== req?.user.id) {
+        return authorizeRoles(Role.ADMIN, Role.SUPER_ADMIN)(req, _res, next);
     }
 
     next();
