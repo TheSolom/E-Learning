@@ -6,7 +6,7 @@ class Role extends Model { }
 Role.init(
     {
         id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.SMALLINT,
             autoIncrement: true,
             primaryKey: true,
         },
@@ -14,6 +14,10 @@ Role.init(
             type: DataTypes.STRING(45),
             allowNull: false,
             unique: true,
+        },
+        sortOrder: {
+            type: DataTypes.SMALLINT,
+            allowNull: false,
         },
     },
     {
