@@ -1,16 +1,26 @@
-import errorHandler from "../utils/error-handler.js";
+import ErrorHandler from "../utils/error.handler.js";
 
-function validateRequest(schema) {
+const validateRequest = (schemas) => {
     return (req, _res, next) => {
-        const { error } = schema.validate(req.body, { abortEarly: false });
+        const validatePart = (schemaKey) => {
+            if (schemas[schemaKey]) {
+                const { error, value } = schemas[schemaKey].validate(req[schemaKey], { abortEarly: false });
+                if (error) {
+                    throw new ErrorHandler(
+                        'Validation failed',
+                        422,
+                        error.details.map((detail) => detail.message)
+                    );
+                }
 
-        if (error) {
-            throw new errorHandler(
-                'Validation failed',
-                422,
-                error.details.map((detail) => detail.message)
-            );
-        }
+                req[schemaKey] = value;
+            }
+        };
+
+        validatePart('headers');
+        validatePart('query');
+        validatePart('params');
+        validatePart('body');
 
         next();
     };

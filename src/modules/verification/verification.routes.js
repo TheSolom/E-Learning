@@ -12,8 +12,8 @@ import validateRequest from '../../middleware/validation.js';
 
 const router = Router();
 
-router.post('/send-otp', validateRequest(sendOTPValidation), sendOTP);
+router.post('/send-otp', validateRequest({ body: sendOTPValidation }), sendOTP);
 
-router.post('/verify-otp', validateRequest(verifyOTPValidation), verifyOTP);
+router.post('/verify-otp', validateRequest({ body: verifyOTPValidation }), verifyOTP);
 
 export default router;

@@ -20,16 +20,16 @@ import { setLoginTokens } from "./token.controller.js";
 
 const router = Router();
 
-router.post('/register', validateRequest(registerValidation), register, sendOTP);
+router.post('/register', validateRequest({ body: registerValidation }), register, sendOTP);
 
-router.post('/login', validateRequest(loginValidation), login, setLoginTokens);
+router.post('/login', validateRequest({ body: loginValidation }), login, setLoginTokens);
 
 router.post('/refresh', refreshLogin, setLoginTokens);
 
 router.post('/logout', logout);
 
-router.post('/forgot-password', validateRequest(forgotPasswordValidation), forgotPassword, sendOTP);
+router.post('/forgot-password', validateRequest({ body: forgotPasswordValidation }), forgotPassword, sendOTP);
 
-router.patch('/reset-password', validateRequest(resetPasswordValidation), resetPassword);
+router.patch('/reset-password', validateRequest({ body: resetPasswordValidation }), resetPassword);
 
 export default router;
