@@ -1,32 +1,32 @@
 import User from '../users/users.model.js';
-import errorHandler from '../../utils/error-handler.js';
+import UserRole from '../users/user-role.model.js';
+import { getUser } from '../users/users.service.js';
+import Role from '../users/roles.enum.js';
+import ErrorHandler from '../../utils/error.handler.js';
 
 export const registerUser = async (userData) => {
     const { dataValues } = await User.create(userData, { returning: true });
+    const { password: _, ...userWithoutPassword } = dataValues;
 
-    const { password, ...userWithoutPassword } = dataValues;
+    await UserRole.create({ userId: userWithoutPassword.id, roleId: Role.STUDENT });
 
-    return userWithoutPassword;
+    return {
+        user: {
+            ...userWithoutPassword,
+            roles: [{ id: Role.STUDENT }]
+        }
+    };
 };
 
-const checkUserCredentials = async (userData) => {
-    const { email, password } = userData;
+export const checkUserCredentials = async (userCredentials) => {
+    const { email, password } = userCredentials;
 
-    const user = await User.findOne({ where: { email } });
-    if (!user) return null;
+    const user = await getUser({ email });
 
-    const isPasswordValid = await user.comparePassword(password);
-    if (!isPasswordValid) return null;
-
-    return user.dataValues;
-};
-
-export const loginUser = async (userCredentials) => {
-    const user = await checkUserCredentials(userCredentials);
-    if (!user) {
-        throw new errorHandler('Incorrect email or password', 401);
+    if (!user || !(await user.comparePassword(password))) {
+        throw new ErrorHandler('Incorrect email or password', 401);
     }
 
-    const { password, ...userWithoutPassword } = user;
+    const { dataValues: { password: _, ...userWithoutPassword } } = user;
     return userWithoutPassword;
 };

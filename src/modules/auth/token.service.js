@@ -1,8 +1,13 @@
 import jwt from 'jsonwebtoken';
 import Token from './token.model.js';
+import ErrorHandler from '../../utils/error.handler.js';
 
 export const verifyToken = (token, secretKey) => {
-    return jwt.verify(token, secretKey, (err, decoded) => err ? null : decoded);
+    return jwt.verify(token, secretKey, (err, decoded) => {
+        if (err)
+            throw new ErrorHandler('Invalid token', 401);
+        return decoded;
+    });
 };
 
 export const createToken = (payload, secretKey, expiresIn) => {
@@ -28,16 +33,16 @@ export const createLoginTokens = async (payload) => {
     try {
         await Token.create({ userId: payload.user.id, token: refreshToken, expiryDateTime: expirationTimeStamp });
     } catch (error) {
-        if (error?.original.code === '23505') return;
+        if (error.name === 'SequelizeUniqueConstraintError') return;
     }
 
     return { accessToken, refreshToken };
 };
 
 export const getToken = async (token) => {
-    const tokenRow = await Token.findOne({ token });
+    const tokenRow = await Token.findOne({ where: { token } });
     if (!tokenRow) {
-        return null;
+        throw new ErrorHandler('Invalid token', 401);
     }
 
     return tokenRow.dataValues;
@@ -46,7 +51,7 @@ export const getToken = async (token) => {
 export const blockToken = async (token) => {
     const [, [tokenRow]] = await Token.update({ blocked: true }, { where: { token }, returning: true });
     if (!tokenRow) {
-        return null;
+        throw new ErrorHandler('Invalid token', 401);
     }
 
     return tokenRow.dataValues;
@@ -54,18 +59,14 @@ export const blockToken = async (token) => {
 
 export const validateRefreshToken = async (refreshToken) => {
     const decodedToken = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    if (!decodedToken) {
-        await blockToken(refreshToken);
-        return null;
-    }
 
     const storedToken = await getToken(refreshToken);
-    if (!storedToken || storedToken.blocked) {
-        return null;
+    if (storedToken.blocked) {
+        throw new ErrorHandler('Invalid token', 401);
     }
-    if (storedToken.userId !== decodedToken.user.id) {
+    if (!decodedToken.user || storedToken.userId !== decodedToken.user.id) {
         await blockToken(refreshToken);
-        return null;
+        throw new ErrorHandler('Invalid token', 401);
     }
 
     return decodedToken;

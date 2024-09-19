@@ -1,5 +1,6 @@
 import { randomInt } from 'node:crypto';
 import OTP from './otp.model.js';
+import ErrorHandler from '../../utils/error.handler.js';
 import convertUtcToLocal from '../../utils/utc-to-local.js';
 
 export const checkOTPCoolDown = async (userId, purpose) => {
@@ -16,16 +17,8 @@ export const checkOTPCoolDown = async (userId, purpose) => {
         const seconds = timeRemaining % 60;
         const remainingTimeString = minutes > 0 ? `${minutes}min ${seconds}s` : `${seconds}s`;
 
-        return {
-            isCoolDown: true,
-            remainingTime: remainingTimeString,
-        };
+        throw new ErrorHandler(`Please wait for ${remainingTimeString} before requesting a new OTP`, 429);
     }
-
-    return {
-        isCoolDown: false,
-        remainingTime: null,
-    };
 };
 
 function generateOTP(length = 6) {
@@ -38,7 +31,7 @@ function generateOTP(length = 6) {
 export const createOTP = async (userId, purpose) => {
     const otp = generateOTP(6);
 
-    await OTP.create({ otp, purpose, userId });
+    await OTP.create({ otp, userId, purpose });
 
     return otp;
 };
@@ -47,20 +40,14 @@ export const verifyOTP = async (userId, otp, purpose) => {
     const otpRow = await OTP.findOne({ where: { userId, purpose }, order: [['createdAt', 'DESC']] });
 
     if (!otpRow || otpRow.dataValues.otp !== otp) {
-        return {
-            isValid: false,
-            cause: 'Invalid OTP'
-        };
+        throw new ErrorHandler('Invalid OTP', 400);
     }
 
     const otpExp = new Date(otpRow.dataValues.expiryDateTime + ' UTC');
     const currentTimeStamp = convertUtcToLocal(new Date(Date.now()));
 
     if (otpExp < currentTimeStamp) {
-        return {
-            isValid: false,
-            cause: 'OTP expired'
-        };
+        throw new ErrorHandler('Expired OTP ', 400);
     }
 
     return {
