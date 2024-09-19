@@ -1,4 +1,4 @@
-const roles = Object.freeze({
+const Role = Object.freeze({
     STUDENT: 1,
     CO_INSTRUCTOR: 2,
     INSTRUCTOR: 3,
@@ -6,4 +6,4 @@ const roles = Object.freeze({
     SUPER_ADMIN: 5,
 });
 
-export default roles;
+export default Role;
