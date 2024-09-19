@@ -1,4 +1,4 @@
-import * as userService from './users.service.js';
+import * as userService from './user.service.js';
 
 export async function getUser(req, res, _next) {
     const { params: { userId } } = req;

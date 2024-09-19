@@ -1,7 +1,7 @@
 import { OTPFactory } from './otp.factory.js';
 import { EmailStrategyContext } from '../sender/email.strategy.js';
 import { VerificationPurpose } from './verification.enum.js';
-import { getUser, updateUser } from '../users/users.service.js';
+import { getUser, updateUser } from '../user/user.service.js';
 
 export async function sendOTP(req, res, _next) {
     const { body: { userId, purpose } } = req;

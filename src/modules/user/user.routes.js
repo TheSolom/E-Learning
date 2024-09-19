@@ -5,7 +5,7 @@ import {
     getUsers,
     updateUser,
     deleteUser,
-} from './users.controller.js';
+} from './user.controller.js';
 import {
     getUserParamsValidation,
     getUsersQueryValidation,
@@ -13,7 +13,7 @@ import {
     updateUserBodyValidation,
     deleteUserHeadersValidation,
     deleteUserParamsValidation,
-} from './users.validation.js';
+} from './user.validation.js';
 import validateRequest from '../../middleware/validation.js';
 import { isAuthenticated, isSameUserOrAdmin } from '../../middleware/auth.js';
 

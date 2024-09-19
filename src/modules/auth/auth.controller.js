@@ -1,6 +1,6 @@
 import * as authService from "./auth.service.js";
 import { createLoginTokens, validateRefreshToken, verifyToken, blockToken } from './token.service.js';
-import { getUser, updateUser } from '../users/users.service.js';
+import { getUser, updateUser } from '../user/user.service.js';
 import ErrorHandler from "../../utils/error.handler.js";
 import { set, remove } from '../../utils/cache.js';
 import { VerificationPurpose } from '../verification/verification.enum.js';

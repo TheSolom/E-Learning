@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import User from './users.model.js';
+import User from './user.model.js';
 import { getOrSet, set, remove } from '../../utils/cache.js';
 import ErrorHandler from '../../utils/error.handler.js';
 

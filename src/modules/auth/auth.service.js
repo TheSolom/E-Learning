@@ -1,7 +1,7 @@
-import User from '../users/users.model.js';
-import UserRole from '../users/user-role.model.js';
-import { getUser } from '../users/users.service.js';
-import Role from '../users/roles.enum.js';
+import User from '../user/user.model.js';
+import UserRole from '../user/user-role.model.js';
+import { getUser } from '../user/user.service.js';
+import Role from '../user/role.enum.js';
 import ErrorHandler from '../../utils/error.handler.js';
 
 export const registerUser = async (userData) => {
