@@ -9,13 +9,13 @@ export const sendOTPValidation = Joi.object({
             'number.positive': "User ID must be a positive number",
             'any.required': "Please enter the user's id",
         }),
-    email: Joi.string()
+    purpose: Joi.string()
         .required()
-        .email()
-        .normalize()
+        .trim()
+        .valid('email_verification', 'password_reset')
         .messages({
-            'any.required': "Please enter the user's email address",
-            'string.email': "Please enter the user's email address",
+            'any.required': 'Please enter the purpose of the OTP',
+            'any.only': 'Invalid purpose',
         }),
 });
 
@@ -28,6 +28,14 @@ export const verifyOTPValidation = Joi.object({
             'number.positive': "User ID must be a positive number",
             'any.required': "Please enter the user's id",
         }),
+    purpose: Joi.string()
+        .required()
+        .trim()
+        .valid('email_verification', 'password_reset')
+        .messages({
+            'any.required': 'Please enter the purpose of the OTP',
+            'any.only': 'Invalid purpose',
+        }),
     otp: Joi.string()
         .required()
         .trim()
@@ -37,13 +45,5 @@ export const verifyOTPValidation = Joi.object({
             'string.length': 'OTP must be exactly 6 digits long',
             'string.pattern.base': 'Invalid OTP',
             'any.required': 'Invalid OTP',
-        }),
-    purpose: Joi.string()
-        .required()
-        .trim()
-        .valid('email_verification', 'password_reset')
-        .messages({
-            'any.required': 'Please enter the purpose of the OTP',
-            'any.only': 'Invalid purpose',
         }),
 });
