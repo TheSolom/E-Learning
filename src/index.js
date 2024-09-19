@@ -1,13 +1,13 @@
 import express from 'express';
-import "express-async-errors";
+import "express-async-errors" ;
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
-
 import setupRoutes from './utils/routes.js';
 import db from './utils/db.js';
+
 import errorMiddleware from './middleware/error.js';
 
 const inProduction = process.env.NODE_ENV === 'production';
@@ -28,5 +28,5 @@ await db.sequelize.sync(inProduction ? undefined : { alter: { drop: true } });
 
 app.use(errorMiddleware);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '127.0.0.1', () => console.log(`Server is running on port ${PORT}`));
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
