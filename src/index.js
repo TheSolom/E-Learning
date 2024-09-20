@@ -5,9 +5,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
-import setupRoutes from './utils/routes.js';
-import PostgresDatabase from './utils/db.js';
-import errorMiddleware from './middleware/error.js';
+import setupRoutes from './shared/utils/routes.js';
+import PostgresDatabase from './shared/utils/db.js';
+import errorMiddleware from './shared/middleware/error.js';
 
 const inProduction = process.env.NODE_ENV === 'production';
 
