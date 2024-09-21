@@ -1,5 +1,5 @@
-import UserLanguage from './data-access/user-language.model.js';
-import ErrorHandler from '../../utils/error.handler.js';
+import UserLanguage from '../data-access/user-language.model.js';
+import ErrorHandler from '../../../shared/utils/error.handler.js';
 
 export const getUserLanguages = async (userId) => {
     const userLanguages = await UserLanguage.findAll({

@@ -1,4 +1,4 @@
-import * as userLanguageService from '../user-language.service.js';
+import * as userLanguageService from '../domain/user-language.service.js';
 
 export async function getUserLanguages(req, res, _next) {
     const { params: { userId } } = req;
