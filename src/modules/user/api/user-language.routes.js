@@ -10,15 +10,14 @@ import {
     addUserLanguageParamsValidation,
     addUserLanguageBodyValidation,
     deleteUserLanguageParamsValidation
-} from "./user-language.validation.js";
-import validateRequest from "../../middleware/validation.js";
-import { isAuthenticated, isSameUserOrAdmin } from "../../middleware/auth.js";
+} from "../domain/user-language.validation.js";
+import validateRequest from "../../../shared/middleware/validation.js";
+import { isAuthenticated, isSameUserOrAdmin } from "../../../shared/middleware/auth.js";
 
 const router = Router();
 
 router.get('/:userId/languages',
     isAuthenticated,
-    isSameUserOrAdmin,
     validateRequest({ params: getUserLanguagesParamsValidation }),
     getUserLanguages
 );
