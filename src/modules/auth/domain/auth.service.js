@@ -11,10 +11,8 @@ export const registerUser = async (userData) => {
     await UserRole.create({ userId: userWithoutPassword.id, roleId: Role.STUDENT });
 
     return {
-        user: {
-            ...userWithoutPassword,
-            roles: [{ id: Role.STUDENT }]
-        }
+        ...userWithoutPassword,
+        roles: [{ id: Role.STUDENT }]
     };
 };
 
