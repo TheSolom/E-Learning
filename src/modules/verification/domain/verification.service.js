@@ -40,19 +40,15 @@ export const verifyOTP = async (userId, otp, purpose) => {
     const otpRow = await OTP.findOne({ where: { userId, purpose }, order: [['createdAt', 'DESC']] });
 
     if (!otpRow || otpRow.dataValues.otp !== otp) {
-        throw new ErrorHandler('Invalid OTP', 400);
+        throw new ErrorHandler('Invalid or expired OTP', 400);
     }
 
     const otpExp = new Date(otpRow.dataValues.expiryDateTime + ' UTC');
     const currentTimeStamp = convertUtcToLocal(new Date(Date.now()));
 
     if (otpExp < currentTimeStamp) {
-        throw new ErrorHandler('Expired OTP ', 400);
+        throw new ErrorHandler('Invalid or expired OTP', 400);
     }
-
-    return {
-        isValid: true
-    };
 };
 
 export const removeOTP = async (userId, otp, purpose) => {
