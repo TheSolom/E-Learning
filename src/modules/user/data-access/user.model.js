@@ -2,6 +2,7 @@ import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '../../../shared/config/postgres.js';
 import ErrorHandler from '../../../shared/utils/error.handler.js';
 import { hashPassword, compareHashedPassword } from '../../../shared/utils/jwt.js';
+import { deleteFile } from '../../../shared/uploader/upload.service.js';
 
 class User extends Model {
     getFullName() {
@@ -38,7 +39,7 @@ User.init(
         },
         photo: {
             type: DataTypes.STRING,
-            defaultValue: null,
+            defaultValue: process.env.USER_DEFAULT_PHOTO,
         },
         bio: {
             type: DataTypes.TEXT,
@@ -65,6 +66,9 @@ User.init(
                 }
                 if (user.changed('password')) {
                     user.password = await hashPassword(user.password);
+                }
+                if (user.changed('photo') && user.previous('photo') !== process.env.USER_DEFAULT_PHOTO) {
+                    await deleteFile(user.previous('photo'), 'image');
                 }
             },
         }

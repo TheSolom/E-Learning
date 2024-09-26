@@ -16,6 +16,7 @@ import {
 } from '../domain/user.validation.js';
 import validateRequest from '../../../shared/middleware/validation.js';
 import { isAuthenticated, isSameUserOrAdmin } from '../../../shared/middleware/auth.js';
+import { uploadSingleFile } from '../../../shared/middleware/media-upload.js';
 
 const router = Router();
 
@@ -30,7 +31,9 @@ router.patch('/:userId/profile',
         params: updateUserParamsValidation,
         body: updateUserBodyValidation
     }),
-    updateUser);
+    uploadSingleFile('photo'),
+    updateUser
+);
 
 router.delete('/:userId',
     isAuthenticated,
