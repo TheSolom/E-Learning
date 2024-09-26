@@ -21,7 +21,6 @@ const setupRoutes = (app, prefix = '') => {
     app.use(`${prefix}/roles`, roleRoutes);
     app.use(`${prefix}/languages`, languageRoutes);
 
-
     app.all('*', (req, _res, next) => {
         next(new ErrorHandler(`Route not found`, 400, `${req.method} ${req.url}`));
     });
