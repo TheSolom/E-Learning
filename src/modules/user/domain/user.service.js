@@ -4,35 +4,34 @@ import { getOrSet, set, remove } from '../../../shared/utils/cache.js';
 import ErrorHandler from '../../../shared/utils/error.handler.js';
 
 export const getUser = async (identifier) => {
+    const findUserOptions = {
+        attributes: { exclude: ['password'] },
+        include: [{
+            model: User.sequelize.models.role,
+            attributes: ['id', 'sortOrder'],
+            through: {
+                model: User.sequelize.models.user_role,
+                attributes: []
+            },
+        }, {
+            model: User.sequelize.models.language,
+            attributes: ['id', 'name'],
+            through: {
+                model: User.sequelize.models.user_language,
+                attributes: []
+            },
+        }]
+    };
+
     let user = null;
 
     if (typeof identifier === 'string' || typeof identifier === 'number') {
-        user = await getOrSet(`user:${identifier}`,
-            async () => {
-                return (await User.findByPk(identifier, {
-                    attributes: { exclude: ['password'] },
-                    include: [{
-                        model: User.sequelize.models.role,
-                        attributes: ['id', 'sortOrder'],
-                        through: {
-                            model: User.sequelize.models.user_role,
-                            attributes: []
-                        },
-                    }]
-                }))?.dataValues;
-            });
+        user = await getOrSet(
+            `user:${identifier}`,
+            async () => (await User.findByPk(identifier, findUserOptions))?.dataValues
+        );
     } else if (typeof identifier === 'object') {
-        user = await User.findOne({
-            where: identifier,
-            include: [{
-                model: User.sequelize.models.role,
-                attributes: ['id', 'sortOrder'],
-                through: {
-                    model: User.sequelize.models.user_role,
-                    attributes: []
-                },
-            }]
-        });
+        user = await User.findOne({ where: identifier, ...findUserOptions });
     }
 
     if (!user) {
