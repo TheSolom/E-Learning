@@ -1,5 +1,5 @@
 import { sendVerificationEmail, sendResetPasswordEmail } from './email.service.js';
-import { VerificationPurpose } from '../../modules/verification/domain/verification.enum.js';
+import VerificationPurpose from '../../modules/verification/domain/verification-purpose.enum.js';
 import ErrorHandler from "../utils/error.handler.js";
 
 class EmailStrategy {

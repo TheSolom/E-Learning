@@ -1,6 +1,6 @@
 import { OTPPurposeHandler } from './otp-purpose.handler.js';
 import * as verificationService from './verification.service.js';
-import { VerificationPurpose } from './verification.enum.js';
+import VerificationPurpose from './verification-purpose.enum.js';
 
 export class EmailVerificationHandler extends OTPPurposeHandler {
     async checkCoolDown(userId) {

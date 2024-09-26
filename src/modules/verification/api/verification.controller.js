@@ -1,6 +1,6 @@
 import { OTPFactory } from '../domain/otp.factory.js';
 import { EmailStrategyContext } from '../../../shared/sender/email.strategy.js';
-import { VerificationPurpose } from '../domain/verification.enum.js';
+import VerificationPurpose from '../domain/verification-purpose.enum.js';
 import { getUser, updateUser } from '../../user/domain/user.service.js';
 
 export async function sendOTP(req, res, _next) {

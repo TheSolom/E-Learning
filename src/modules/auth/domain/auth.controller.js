@@ -3,7 +3,7 @@ import { createLoginTokens, validateRefreshToken, verifyToken, blockToken } from
 import { getUser, updateUser } from '../../user/domain/user.service.js';
 import ErrorHandler from "../../../shared/utils/error.handler.js";
 import { set, remove } from '../../../shared/utils/cache.js';
-import { VerificationPurpose } from '../../verification/domain/verification.enum.js';
+import VerificationPurpose from '../../verification/domain/verification-purpose.enum.js';
 
 export async function register(req, _res, next) {
     const { body: userData } = req;

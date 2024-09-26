@@ -1,6 +1,6 @@
 import { EmailVerificationHandler } from './email-verification.handler.js';
 import { PasswordResetHandler } from './password-reset.handler.js';
-import { VerificationPurpose } from './verification.enum.js';
+import VerificationPurpose from './verification-purpose.enum.js';
 import ErrorHandler from "../../../shared/utils/error.handler.js";
 
 export class OTPFactory {
