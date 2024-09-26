@@ -1,8 +1,9 @@
 import { v2 as cloudinary } from 'cloudinary';
+import ErrorHandler from "../utils/error.handler.js";
 
 const { CLOUDINARY_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
 if (!CLOUDINARY_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
-    throw new Error('Cloudinary credentials not found');
+    throw new ErrorHandler('Cloudinary credentials not found', 500, null, true);
 }
 
 cloudinary.config({

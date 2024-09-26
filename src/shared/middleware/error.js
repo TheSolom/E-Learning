@@ -29,8 +29,11 @@ const sendError = (error, res, isProduction = false) => {
 };
 
 const errorMiddleware = (error, _req, res, _next) => {
+    // eslint-disable-next-line no-console
+    console.error(error.message);
+
     error.statusCode = error.statusCode || 500;
-    error.message = error.message || 'Internal server error';
+    error.message = error.message && !error.isInternal ? error.message : 'Internal server error';
 
     error = handleSequelizeErrors(error);
 

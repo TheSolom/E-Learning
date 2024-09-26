@@ -1,9 +1,10 @@
 import { sendVerificationEmail, sendResetPasswordEmail } from './email.service.js';
 import { VerificationPurpose } from '../../modules/verification/domain/verification.enum.js';
+import ErrorHandler from "../utils/error.handler.js";
 
 class EmailStrategy {
     async sendEmail(email, otp) {
-        throw new Error('sendEmail method must be implemented');
+        throw new ErrorHandler('sendEmail method must be implemented', 500, null, true);
     }
 }
 
@@ -29,7 +30,7 @@ export class EmailStrategyContext {
                 this.strategy = new ResetPasswordEmailStrategy();
                 break;
             default:
-                throw new Error('Invalid email purpose');
+                throw new ErrorHandler('Invalid email purpose', 400);
         }
     }
 

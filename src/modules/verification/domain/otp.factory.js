@@ -1,6 +1,7 @@
 import { EmailVerificationHandler } from './email-verification.handler.js';
 import { PasswordResetHandler } from './password-reset.handler.js';
 import { VerificationPurpose } from './verification.enum.js';
+import ErrorHandler from "../../../shared/utils/error.handler.js";
 
 export class OTPFactory {
     static getOTPPurposeHandler(purpose) {
@@ -10,7 +11,7 @@ export class OTPFactory {
             case VerificationPurpose.PASSWORD_RESET:
                 return new PasswordResetHandler();
             default:
-                throw new Error('Invalid OTP purpose');
+                throw new ErrorHandler('Invalid OTP purpose', 400);
         }
     }
 }

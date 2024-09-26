@@ -1,8 +1,9 @@
 import { createTransport } from 'nodemailer';
+import ErrorHandler from "../utils/error.handler.js";
 
 const { NODEMAILER_USER, NODEMAILER_PASS } = process.env;
 if (!NODEMAILER_USER || !NODEMAILER_PASS) {
-    throw new Error('Nodemailer credentials not found');
+    throw new ErrorHandler('Nodemailer credentials not found', 500, null, true);
 }
 
 const transporter = createTransport({
